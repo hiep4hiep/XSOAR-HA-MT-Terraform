@@ -19,6 +19,9 @@ This deployment will only install the application on XSOAR main servers. After a
 After the Terraform deployment is completed, the script will provide output to ***xsoar_host_installation_script.sh*** file that you can use to install Host server.
 
 ### Execution
+#### Prepare your VPC
+- Make sure your VPC has 3 public subnets in 3 AZs
+- XSOAR installation requires Internet access so the instances must sit behind IGW with EIP
 #### Clone this repo
 Clone this repo to your computer
 #### Update the required parameter in the var.tf file
