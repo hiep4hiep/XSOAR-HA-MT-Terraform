@@ -9,7 +9,7 @@ data "aws_vpc" "current" {
 }
 
 resource "aws_security_group" "xsoar_main_opensearch" {
-  name        = "hnguyen-opensearch-${var.xsoar_main_opensearch_domain}"
+  name        = "${var.deployment_prefix}-opensearch-${var.xsoar_main_opensearch_domain}"
   description = "Managed by Terraform"
   vpc_id      = data.aws_vpc.current.id
 
@@ -30,7 +30,7 @@ resource "aws_opensearch_domain" "xsoar_main_opensearch" {
   engine_version = "OpenSearch_2.9"
 
   cluster_config {
-    instance_type = "m5.large.search"
+    instance_type = var.opensearch_instance_type
     instance_count = 3
     dedicated_master_enabled = true
     dedicated_master_count   = 3

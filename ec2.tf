@@ -38,8 +38,8 @@ resource "aws_security_group" "xsoar_main_app" {
 
 # Create XSOAR Main servers
 resource "aws_instance" "xsoar_app_01" {
-  ami           = "ami-0df4b2961410d4cff"
-  instance_type = "t2.small"
+  ami           = var.xsoar_ami
+  instance_type = var.xsoar_main_instance_type
   associate_public_ip_address = true
   subnet_id = var.aws_subnet_az1
   vpc_security_group_ids = ["${aws_security_group.xsoar_main_app.id}"]
@@ -71,8 +71,8 @@ EOF
 }
 
 resource "aws_instance" "xsoar_app_02" {
-  ami           = "ami-0df4b2961410d4cff"
-  instance_type = "t2.small"
+  ami           = var.xsoar_ami
+  instance_type = var.xsoar_main_instance_type
   associate_public_ip_address = true
   subnet_id = var.aws_subnet_az2
   vpc_security_group_ids = ["${aws_security_group.xsoar_main_app.id}"]
@@ -104,8 +104,8 @@ EOF
 }
 
 resource "aws_instance" "xsoar_app_03" {
-  ami           = "ami-0df4b2961410d4cff"
-  instance_type = "t2.small"
+  ami           = var.xsoar_ami
+  instance_type = var.xsoar_main_instance_type
   associate_public_ip_address = true
   subnet_id = var.aws_subnet_az3
   vpc_security_group_ids = ["${aws_security_group.xsoar_main_app.id}"]
@@ -138,8 +138,8 @@ EOF
 
 # EC2 for Host servers
 resource "aws_instance" "xsoar_host_01" {
-  ami           = "ami-0df4b2961410d4cff"
-  instance_type = "t2.small"
+  ami           = var.xsoar_ami
+  instance_type = var.xsoar_host_instance_type
   associate_public_ip_address = false
   subnet_id = var.aws_subnet_az1
   vpc_security_group_ids = ["${aws_security_group.xsoar_main_app.id}"]
@@ -156,8 +156,8 @@ resource "aws_instance" "xsoar_host_01" {
 }
 
 resource "aws_instance" "xsoar_host_02" {
-  ami           = "ami-0df4b2961410d4cff"
-  instance_type = "t2.small"
+  ami           = var.xsoar_ami
+  instance_type = var.xsoar_host_instance_type
   associate_public_ip_address = false
   subnet_id = var.aws_subnet_az2
   vpc_security_group_ids = ["${aws_security_group.xsoar_main_app.id}"]
@@ -175,8 +175,8 @@ resource "aws_instance" "xsoar_host_02" {
 
 
 resource "aws_instance" "xsoar_host_03" {
-  ami           = "ami-0df4b2961410d4cff"
-  instance_type = "t2.small"
+  ami           = var.xsoar_ami
+  instance_type = var.xsoar_host_instance_type
   associate_public_ip_address = false
   subnet_id = var.aws_subnet_az3
   vpc_security_group_ids = ["${aws_security_group.xsoar_main_app.id}"]

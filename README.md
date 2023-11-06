@@ -11,8 +11,8 @@ This IaC pack will deploy everything in a single VPC:
 - 3 Main XSOAR application servers in 3 AZs
 - 3 Host XSOAR servers in 3 AZs. These 3 hosts are belong to the same host HA group.
 - 1 OpenSearch cluster with 3 master nodes and 3 data nodes
-- 2 EFS mount
-- 1 Network Load Balancer for XSOAR main application servers
+- 2 EFS mount points for XSOAR Main and XSOAR Host
+- 1 internal Network Load Balancer for XSOAR main application servers
 
 ### Note for XSOAR Host installation
 This deployment will only install the application on XSOAR main servers. After accessing XSOAR main servers web UI, you need to activate license, generate Host installer, copy to the Host servers then run the installation script in each Host server manually (or via any other automation/provisioning tools like Ansible).
@@ -24,8 +24,9 @@ After the Terraform deployment is completed, the script will provide output to *
 - Make sure your computer has the correct aws credential to connect to your desired AWS environment, similar to using aws cli
 #### Clone this repo
 Clone this repo to your computer
-#### Update the required parameter in the var.tf file
-Edit the ***var.tf*** file to provide the required data for the deployment such as VPC ID, 3 Subnet ID, and some initial information for OpenSearch, system prefix...etc.
+#### Update the required parameter in the terraform.tfvars file
+- Edit the ***terraform.tfvars*** file to provide the required data for the deployment such as VPC ID, 3 Subnet ID, and some initial information for OpenSearch, system prefix...etc.
+- Refer to the ***var.tf*** file for description
 #### Run terraform
 ```
 terraform init
@@ -37,12 +38,12 @@ terraform apply
 - Upload license
 - Change the external hostname to the AWS load balancer domain
 - Create HA host group
-- Generate host installer
+- Generate and download the host installer
 
 #### Install XSOAR on the Host servers
-- Copy the host installer to each Host servers
+- Copy the host installer to each Host servers (the name is like demistohost_12345.sh)
 - Copy the ***xsoar_host_installation_script.sh*** to each Host servers 
-- Switch to root
+- Switch to root `sudo -i`
 - Run `chmod +x xsoar_host_installation_script.sh`
 - Run `./xsoar_host_installation_script.sh <path-to-host-installer-file name>` (e.g. ./xsoar_host_installation_script.sh /home/test/demistohost_1234.sh)
 

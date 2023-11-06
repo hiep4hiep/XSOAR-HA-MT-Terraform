@@ -1,42 +1,64 @@
-variable "aws_vpc" {
-    default = "<your-vpc-id>"
+# The prefix that will be appended to your resource name, e.g dev, uat, prod, test, somename...
+variable "deployment_prefix" {
+    description = "your deployment prefix"
 }
 
-# Create 3 subnets in 3 AZ and put subnet IDs here
+variable "aws_vpc" {
+    description = "your vpc id"
+}
+
+# 3 public subnets in 3 AZ
 variable "aws_subnet_az1" {
-    default = "<your-subnet-in-az1>"
+    description = "your subnet ID in az1"
 }
 
 variable "aws_subnet_az2" {
-    default = "<your-subnet-in-az2>"
+    description = "your subnet ID in az2"
 }
 
 variable "aws_subnet_az3" {
-    default = "<your-subnet-in-az3>"
+    description = "your subnet ID in az3"
 }
 
-# The prefix that will be appended to your resource name, e.g dev, uat, prod, test, somename...
-variable "deployment_prefix" {
-    default = "<your-deployment-prefix>"
+# EC2 instance type like t2.small, m5.large
+variable "xsoar_main_instance_type" {
+    description = "xsoar main instance type"
+}
+variable "xsoar_host_instance_type" {
+    description = "xsoar host instance type"
+}
+variable "xsoar_ami" {
+    description = "ami id for xsoar main and host EC2"
+}
+
+
+# OpenSearch
+variable "opensearch_instance_type" {
+    description = "opensearch instance type"
 }
 
 variable "xsoar_main_opensearch_domain" {
-    default = "<name-of-your-opensearch-domain>" # Put any name you want here, it will be the name of the OpenSearch cluster
+    description = "name of your opensearch domain" 
 }
 
 variable "opensearch_master_user" {
-    default = "<opensearch-master-username>"
+    description = "opensearch master username"
 }
 
 variable "opensearch_master_password" {
-    default = "<opensearch-master-password>"
+    description = "opensearch master password"
 }
 
 variable "xsoar_download_url" {
-    default = "<url-to-download-xsoar-installer."  # URL to download XSOAR installer
+    description = "url to download xsoar installer." 
+}
+
+variable "public_key" {
+    description = "path to ssh key"
 }
 
 data "local_file" "public_key" {
-  filename = "<path-to-ssh-key>" # This public key will be used for EC2 instances
+  filename = var.public_key
 }
+
 
