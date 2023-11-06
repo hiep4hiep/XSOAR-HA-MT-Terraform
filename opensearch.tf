@@ -1,9 +1,5 @@
 ### Open Search cluster for both Main and Host servers
 
-data "aws_region" "current" {}
-
-data "aws_caller_identity" "current" {}
-
 data "aws_vpc" "current" {
   id = var.aws_vpc
 }
