@@ -17,7 +17,7 @@ resource "aws_security_group" "xsoar_main_lb" {
   egress {
     from_port   = 0
     to_port     = 0
-    protocol    = "-1"  # Indicates all protocols
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }

@@ -17,7 +17,7 @@ resource "aws_security_group" "xsoar_main_efs_sg" {
   egress {
     from_port   = 0
     to_port     = 0
-    protocol    = "-1"  # Indicates all protocols
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
@@ -35,21 +35,21 @@ resource "aws_efs_file_system" "xsoar_main_efs" {
 resource "aws_efs_mount_target" "xsoar_main_mount_az1" {
   count          = 1
   file_system_id = aws_efs_file_system.xsoar_main_efs.id
-  subnet_id      = var.aws_subnet_az1  # Replace with the subnet ID where your EC2 instance resides  
+  subnet_id      = var.aws_subnet_az1  
   security_groups = ["${aws_security_group.xsoar_main_efs_sg.id}"]
 }
 
 resource "aws_efs_mount_target" "xsoar_main_mount_az2" {
   count          = 1
   file_system_id = aws_efs_file_system.xsoar_main_efs.id
-  subnet_id      = var.aws_subnet_az2  # Replace with the subnet ID where your EC2 instance resides  
+  subnet_id      = var.aws_subnet_az2 
   security_groups = ["${aws_security_group.xsoar_main_efs_sg.id}"]
 }
 
 resource "aws_efs_mount_target" "xsoar_main_mount_az3" {
   count          = 1
   file_system_id = aws_efs_file_system.xsoar_main_efs.id
-  subnet_id      = var.aws_subnet_az3  # Replace with the subnet ID where your EC2 instance resides  
+  subnet_id      = var.aws_subnet_az3 
   security_groups = ["${aws_security_group.xsoar_main_efs_sg.id}"]
 }
 
@@ -71,21 +71,21 @@ resource "aws_efs_file_system" "xsoar_host_efs" {
 resource "aws_efs_mount_target" "xsoar_host_mount_az1" {
   count          = 1
   file_system_id = aws_efs_file_system.xsoar_host_efs.id
-  subnet_id      = var.aws_subnet_az1  # Replace with the subnet ID where your EC2 instance resides  
+  subnet_id      = var.aws_subnet_az1
   security_groups = ["${aws_security_group.xsoar_main_efs_sg.id}"]
 }
 
 resource "aws_efs_mount_target" "xsoar_host_mount_az2" {
   count          = 1
   file_system_id = aws_efs_file_system.xsoar_host_efs.id
-  subnet_id      = var.aws_subnet_az2  # Replace with the subnet ID where your EC2 instance resides  
+  subnet_id      = var.aws_subnet_az2
   security_groups = ["${aws_security_group.xsoar_main_efs_sg.id}"]
 }
 
 resource "aws_efs_mount_target" "xsoar_host_mount_az3" {
   count          = 1
   file_system_id = aws_efs_file_system.xsoar_host_efs.id
-  subnet_id      = var.aws_subnet_az3  # Replace with the subnet ID where your EC2 instance resides  
+  subnet_id      = var.aws_subnet_az3
   security_groups = ["${aws_security_group.xsoar_main_efs_sg.id}"]
 }
 
