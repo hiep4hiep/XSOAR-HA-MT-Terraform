@@ -40,7 +40,7 @@ resource "aws_security_group" "xsoar_main_app" {
 resource "aws_instance" "xsoar_app_01" {
   ami           = var.xsoar_ami
   instance_type = var.xsoar_main_instance_type
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   subnet_id = var.aws_subnet_az1
   vpc_security_group_ids = ["${aws_security_group.xsoar_main_app.id}"]
   key_name = aws_key_pair.lab_key.key_name
@@ -73,7 +73,7 @@ EOF
 resource "aws_instance" "xsoar_app_02" {
   ami           = var.xsoar_ami
   instance_type = var.xsoar_main_instance_type
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   subnet_id = var.aws_subnet_az2
   vpc_security_group_ids = ["${aws_security_group.xsoar_main_app.id}"]
   key_name = aws_key_pair.lab_key.key_name
@@ -106,7 +106,7 @@ EOF
 resource "aws_instance" "xsoar_app_03" {
   ami           = var.xsoar_ami
   instance_type = var.xsoar_main_instance_type
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   subnet_id = var.aws_subnet_az3
   vpc_security_group_ids = ["${aws_security_group.xsoar_main_app.id}"]
   key_name = aws_key_pair.lab_key.key_name

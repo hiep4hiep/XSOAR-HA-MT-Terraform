@@ -86,7 +86,7 @@ resource "aws_opensearch_domain" "xsoar_main_opensearch" {
             "AWS": "*"
           },
           "Action": "es:*",
-          "Resource": "arn:aws:es:ap-southeast-2:751512424814:domain/${var.xsoar_main_opensearch_domain}/*"
+          "Resource": "arn:aws:es:ap-southeast-2:${var.account_id}:domain/${var.xsoar_main_opensearch_domain}/*"
         }
       ]
     }

@@ -33,7 +33,7 @@ resource "aws_lb" "xsoar_main_lb" {
 }
 
 resource "aws_lb_target_group" "xsoar_main_group" {
-  name        = "${var.deployment_prefix}-xsoar-app-lb-target-group"
+  name        = "${var.deployment_prefix}-xsoar-tg"
   port        = 443
   protocol    = "TCP"
   target_type = "instance"
