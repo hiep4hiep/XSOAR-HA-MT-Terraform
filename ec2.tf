@@ -15,7 +15,8 @@ resource "aws_security_group" "xsoar_main_app" {
 
     cidr_blocks = [
       data.aws_vpc.current.cidr_block,
-      "130.41.199.0/24"
+      "130.41.199.0/24",
+      "13.237.90.83/32"
     ]
   }
   ingress {
@@ -53,21 +54,6 @@ resource "aws_instance" "xsoar_app_01" {
     encrypted   = true
   }
   iam_instance_profile = aws_iam_instance_profile.xsoar_main_server_profile.name
-  user_data = <<EOF
-#!/bin/bash
-mkdir /var/lib/demisto
-apt-get update -y
-apt-get install nfs-common -y
-apt-get install jq -y
-mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 ${aws_efs_mount_target.xsoar_main_mount_az1[0].dns_name}:/ /var/lib/demisto
-echo ${aws_efs_mount_target.xsoar_main_mount_az1[0].dns_name}:/ /var/lib/demisto nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0 >> /etc/fstab
-wget "${var.xsoar_download_url}" -O demisto_installer.sh
-chmod +x demisto_installer.sh
-./demisto_installer.sh -- -y -multi-tenant -elasticsearch-url=https://${aws_opensearch_domain.xsoar_main_opensearch.endpoint} -elasticsearch-username=${var.opensearch_master_user} -elasticsearch-password=${var.opensearch_master_password} -do-not-start-server
-jq '.elasticsearch += {"shards":{"common-invplaybook":3,"common-entry":3},"replicas":{"common-invplaybook":1,"common-entry":1},"defaultShardsPerIndex":1,"defaultReplicasPerIndex":2,"refreshIntervals":{"*":"30s","common-configuration":"1s","common-incident":"1s"}}' /etc/demisto.conf > temp.conf && mv temp.conf /etc/demisto.conf
-chown -R demisto:demisto /etc/demisto.conf
-systemctl start demisto
-EOF
 }
 
 resource "aws_instance" "xsoar_app_02" {
@@ -86,21 +72,6 @@ resource "aws_instance" "xsoar_app_02" {
     encrypted   = true
   }
   iam_instance_profile = aws_iam_instance_profile.xsoar_main_server_profile.name
-  user_data = <<EOF
-#!/bin/bash
-mkdir /var/lib/demisto
-apt-get update -y
-apt-get install nfs-common -y
-apt-get install jq -y
-mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 ${aws_efs_mount_target.xsoar_main_mount_az1[0].dns_name}:/ /var/lib/demisto
-echo ${aws_efs_mount_target.xsoar_main_mount_az1[0].dns_name}:/ /var/lib/demisto nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0 >> /etc/fstab
-wget "${var.xsoar_download_url}" -O demisto_installer.sh
-chmod +x demisto_installer.sh
-./demisto_installer.sh -- -y -multi-tenant -elasticsearch-url=https://${aws_opensearch_domain.xsoar_main_opensearch.endpoint} -elasticsearch-username=${var.opensearch_master_user} -elasticsearch-password=${var.opensearch_master_password} -do-not-start-server
-jq '.elasticsearch += {"shards":{"common-invplaybook":3,"common-entry":3},"replicas":{"common-invplaybook":1,"common-entry":1},"defaultShardsPerIndex":1,"defaultReplicasPerIndex":2,"refreshIntervals":{"*":"30s","common-configuration":"1s","common-incident":"1s"}}' /etc/demisto.conf > temp.conf && mv temp.conf /etc/demisto.conf
-chown -R demisto:demisto /etc/demisto.conf
-systemctl start demisto
-EOF
 }
 
 resource "aws_instance" "xsoar_app_03" {
@@ -119,21 +90,6 @@ resource "aws_instance" "xsoar_app_03" {
     encrypted   = true
   }
   iam_instance_profile = aws_iam_instance_profile.xsoar_main_server_profile.name
-  user_data = <<EOF
-#!/bin/bash
-mkdir /var/lib/demisto
-apt-get update -y
-apt-get install nfs-common -y
-apt-get install jq -y
-mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 ${aws_efs_mount_target.xsoar_main_mount_az1[0].dns_name}:/ /var/lib/demisto
-echo ${aws_efs_mount_target.xsoar_main_mount_az1[0].dns_name}:/ /var/lib/demisto nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0 >> /etc/fstab
-wget "${var.xsoar_download_url}" -O demisto_installer.sh
-chmod +x demisto_installer.sh
-./demisto_installer.sh -- -y -multi-tenant -elasticsearch-url=https://${aws_opensearch_domain.xsoar_main_opensearch.endpoint} -elasticsearch-username=${var.opensearch_master_user} -elasticsearch-password=${var.opensearch_master_password} -do-not-start-server
-jq '.elasticsearch += {"shards":{"common-invplaybook":3,"common-entry":3},"replicas":{"common-invplaybook":1,"common-entry":1},"defaultShardsPerIndex":1,"defaultReplicasPerIndex":2,"refreshIntervals":{"*":"30s","common-configuration":"1s","common-incident":"1s"}}' /etc/demisto.conf > temp.conf && mv temp.conf /etc/demisto.conf
-chown -R demisto:demisto /etc/demisto.conf
-systemctl start demisto
-EOF
 }
 
 # EC2 for Host servers
@@ -229,3 +185,109 @@ EOF
 output "xsoar_main_ip" {
   value = "${aws_instance.xsoar_app_01.public_ip}, ${aws_instance.xsoar_app_02.public_ip}, ${aws_instance.xsoar_app_03.public_ip}"
 }
+
+
+resource "local_file" "ansible_inventory" {
+  content = <<EOF
+all:
+    children:
+        # Group XSOAR servers
+        xsoar_main:
+            hosts:
+                xsoar_app_01:
+                    ansible_host: ${aws_instance.xsoar_app_01.private_dns}
+                    ansible_connection: ssh
+                    ansible_user: ubuntu
+                    ansible_ssh_private_key_file: aws_lab
+                    xsoar_installer: demistoserver-6.2-1473927.sh
+                xsoar_app_02:
+                    ansible_host: ${aws_instance.xsoar_app_02.private_dns}
+                    ansible_connection: ssh
+                    ansible_user: ubuntu
+                    ansible_ssh_private_key_file: aws_lab
+                    xsoar_installer: demistoserver-6.2-1473927.sh
+                xsoar_app_03:
+                    ansible_host: ${aws_instance.xsoar_app_03.private_dns}
+                    ansible_connection: ssh
+                    ansible_user: ubuntu
+                    ansible_ssh_private_key_file: aws_lab
+                    xsoar_installer: demistoserver-6.2-1473927.sh
+        xsoar_host:
+            hosts:
+                xsoar_host_01:
+                    ansible_host: ${aws_instance.xsoar_host_01.private_dns}
+                    ansible_connection: ssh
+                    ansible_user: ubuntu
+                    ansible_ssh_private_key_file: aws_lab
+                    xsoar_installer: demistoserver-6.2-1473927.sh
+                xsoar_host_02:
+                    ansible_host: ${aws_instance.xsoar_host_02.private_dns}
+                    ansible_connection: ssh
+                    ansible_user: ubuntu
+                    ansible_ssh_private_key_file: aws_lab
+                    xsoar_installer: demistoserver-6.2-1473927.sh
+                xsoar_host_03:
+                    ansible_host: ${aws_instance.xsoar_host_03.private_dns}
+                    ansible_connection: ssh
+                    ansible_user: ubuntu
+                    ansible_ssh_private_key_file: aws_lab
+                    xsoar_installer: demistoserver-6.2-1473927.sh
+EOF
+  filename = "./ansible_inventory.yaml"
+}
+
+resource "local_file" "xsoar_main_playbook.yaml" {
+  content = <<EOF
+-   name: INSTALL XSOAR SERVERS
+    hosts: xsoar
+    tasks:
+    # Install NFS client
+        -   name: Install NFS client on Debian
+            become: yes
+            apt:
+                name: nfs-common
+                state: present
+                update_cache: yes
+    # Create demisto folder to mount
+        -   name: Create demisto folder
+            become: yes
+            command: mkdir -p /var/lib/demisto
+    # Mount to NFS Server shared folder
+        -   name: Mount to NFS Server
+            become: yes
+            command: mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 ${aws_efs_mount_target.xsoar_main_mount_az1[0].dns_name}:/ /var/lib/demisto
+        -   name: Mount permanently
+            become: yes
+            lineinfile: 
+                path: /etc/fstab
+                line: "${aws_efs_mount_target.xsoar_main_mount_az1[0].dns_name}:/   /var/lib/demisto    nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0"
+                state: present
+    # Install XSOAR
+        -   name: Download foo.conf
+            ansible.builtin.get_url:
+              url: ${var.xsoar_download_url}
+              dest: /home/ubuntu/demisto_installer.sh
+              mode: '0777'
+        -   name: Run XSOAR installer script
+            become: yes
+            command: ./home/ubuntu/demisto_installer.sh -- -y -multi-tenant -elasticsearch-url=https://${aws_opensearch_domain.xsoar_main_opensearch.endpoint} -elasticsearch-username=${var.opensearch_master_user} -elasticsearch-password=${var.opensearch_master_password} -do-not-start-server
+        -   name: Update XSOAR ES Settings
+            become: yes
+            command: jq '.elasticsearch += {"shards":{"common-invplaybook":3,"common-entry":3},"replicas":{"common-invplaybook":1,"common-entry":1},"defaultShardsPerIndex":1,"defaultReplicasPerIndex":2,"refreshIntervals":{"*":"30s","common-configuration":"1s","common-incident":"1s"}}' /etc/demisto.conf > temp.conf && mv temp.conf /etc/demisto.conf
+        -   name: Change file ownership, group and permissions
+            ansible.builtin.file:
+              path: /etc/demisto.conf
+              owner: demisto
+              group: demisto
+              mode: '0644'
+        -   name: Make sure XSOAR service is running
+            ansible.builtin.systemd_service:
+              state: started
+              name: demisto
+EOF
+  filename = "./xsoar_main_playbook.yaml"
+}
+
+
+
+

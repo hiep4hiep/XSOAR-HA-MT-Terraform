@@ -7,7 +7,11 @@ variable "aws_vpc" {
     description = "your vpc id"
 }
 
-# 3 public subnets in 3 AZ
+variable "account_id" {
+    description = "your account id"
+}
+
+# 3 private subnets in 3 AZ
 variable "aws_subnet_az1" {
     description = "your subnet ID in az1"
 }
@@ -17,6 +21,19 @@ variable "aws_subnet_az2" {
 }
 
 variable "aws_subnet_az3" {
+    description = "your subnet ID in az3"
+}
+
+# 3 public subnets in 3 AZ
+variable "aws_public_subnet_az1" {
+    description = "your subnet ID in az1"
+}
+
+variable "aws_public_subnet_az2" {
+    description = "your subnet ID in az2"
+}
+
+variable "aws_public_subnet_az3" {
     description = "your subnet ID in az3"
 }
 

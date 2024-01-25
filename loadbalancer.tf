@@ -11,7 +11,8 @@ resource "aws_security_group" "xsoar_main_lb" {
 
     cidr_blocks = [
       data.aws_vpc.current.cidr_block,
-      "130.41.199.0/24"
+      "130.41.199.0/24",
+      "13.237.90.83/32"
     ]
   }
   egress {
@@ -25,9 +26,9 @@ resource "aws_security_group" "xsoar_main_lb" {
 
 resource "aws_lb" "xsoar_main_lb" {
   name               = "${var.deployment_prefix}-xsoar-app-lb"
-  internal           = true
+  internal           = false
   load_balancer_type = "network"
-  subnets            = [var.aws_subnet_az1,var.aws_subnet_az2,var.aws_subnet_az3]
+  subnets            = [var.aws_public_subnet_az1,var.aws_public_subnet_az2,var.aws_public_subnet_az3]
   security_groups = [aws_security_group.xsoar_main_lb.id]
   enable_http2 = true
 }
